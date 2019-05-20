@@ -1,0 +1,26 @@
+<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap.gl-sm="1em" style="margin:1em;padding-top: 2em" fxLayoutAlign="center center">
+  <div fxFlex *ngIf="ent.regPersons.length<1" ><h1 style="text-align:center">THERE ISNT REGISTER YET</h1></div>
+  <div fxFlex=60 *ngIf="ent.regPersons.length>0">
+      <table mat-table [dataSource]="ent.regPersons" class="mat-elevation-z8" style="width:100%">
+          <ng-container matColumnDef="Name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+          
+            <!-- Weight Column -->
+            <ng-container matColumnDef="Dinner">
+              <th mat-header-cell *matHeaderCellDef> Dinner </th>
+              <td mat-cell *matCellDef="let element"> {{element.dinner}} </td>
+            </ng-container>
+          
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="Chair">
+              <th mat-header-cell *matHeaderCellDef> Chair </th>
+              <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+            </ng-container>
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<mat-card class="example-header-image">
+  <mat-card-header>
+    <mat-card-title>Registrar Categorias</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+
+    <form #formCategoric="ngForm" (ngSubmit)="saveCategoria()">
+      <div fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap.gt-sm="15px">
+
+        <mat-form-field fxFlex appearance="outline">
+          <mat-label>Código</mat-label>
+          <input type="text" matInput name="codigo" id="codigo" [(ngModel)]="categorias.codigo" #codigo='ngModel'
+            required>
+          <mat-hint *ngIf="codigo.invalid && (codigo.dirty || codigo.touched)">El nombre es obligatorio
+          </mat-hint>
+        </mat-form-field>
+
+        <mat-form-field fxFlex appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input type="text" matInput name="nombre" id="nombre" [(ngModel)]="categorias.nombre" required>
+        </mat-form-field>
+
+
+        <mat-form-field fxFlex appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <input type="text" matInput name="descripcion" id="descripcion" [(ngModel)]="categorias.descripcion"
+            #descripcion="ngModel" required>
+          <mat-hint *ngIf="descripcion.invalid && (descripcion.dirty || descripcion.touched)">La descripcion es
+            obligatorio
+          </mat-hint>
+        </mat-form-field>
+      
+        <mat-form-field fxFlex appearance="outline">
+          <mat-label>estado</mat-label>
+          <mat-select name="activo" id="activo" [(ngModel)]="categorias.activo" 	#activo="ngModel" required>
+            <mat-option *ngFor="let es of estado" [value]="es.key">
+              {{es.value}}
+            </mat-option>
+                       </mat-select>
+                       <mat-hint *ngIf="activo.invalid && (activo.dirty || activo.touched)">El tipo usuario
+                        es
+                        obligatorio</mat-hint>
+        </mat-form-field>
+
+      </div>
+
+
+      <div>
+        <button type="submit" mat-raised-button color="primary" [disabled]="!formCategoric.form.valid"> Guardar
+        </button>
+        <button type="button" (click)="editCategoria()" mat-raised-button color="primary" [disabled]="!formCategoric.form.valid"> Editar
+        </button>
+         </div>
+<!-- 
+         <div>
+          <button type="button" (click)="imprimir()" mat-raised-button color="primary" [disabled]="!formCategoric.form.valid"> Editar
+          </button>
+          
+        </div> -->
+
+    </form>
+  </mat-card-content>
+
+</mat-card>

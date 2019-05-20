@@ -1,0 +1,38 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport="true"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="!(isHandset$ | async)">
+	
+	 <!-- <img src="../../assets/imagenes/logo.jpg" alt="Logo del menú" class="img-menu"> -->
+
+    <mat-nav-list *ngFor="let item of menu">
+
+      <a mat-list-item (click)="item.show = !item.show">
+        <mat-icon matListIcon>{{item.icono}}</mat-icon>
+        <a mat-list-item *ngIf="item.child.length === 0" [routerLink]="item.link" >
+          {{item.nombre}} </a>
+        <a mat-list-item *ngIf="item.child.length > 0">{{item.nombre}}</a>
+      </a>
+
+      <mat-list *ngIf="item.child.length > 0 && item.show" style="margin-left: 30px;">
+
+        <mat-list-item *ngFor="let son of item.child">
+          <mat-icon matListIcon>{{son.icono}}</mat-icon>
+          <a mat-list-item [routerLink]="son.link">{{son.nombre}}</a>
+        </mat-list-item>
+      </mat-list>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span>Prueba Arahugo y Cegovia</span>
+	</mat-toolbar>
+	
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
