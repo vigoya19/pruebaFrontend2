@@ -11,14 +11,14 @@
         <mat-form-field fxFlex appearance="outline">
           <mat-label>Código</mat-label>
           <input type="text" matInput name="codigo" id="codigo" [(ngModel)]="categorias.codigo" #codigo='ngModel'
-            required>
+          pattern="[A-Za-z0-9]{4,10}" required>
           <mat-hint *ngIf="codigo.invalid && (codigo.dirty || codigo.touched)">El nombre es obligatorio
           </mat-hint>
         </mat-form-field>
 
         <mat-form-field fxFlex appearance="outline">
           <mat-label>Nombre</mat-label>
-          <input type="text" matInput name="nombre" id="nombre" [(ngModel)]="categorias.nombre" required>
+          <input type="text" matInput name="nombre" id="nombre" [(ngModel)]="categorias.nombre"    pattern="[A-Za-z0-9]{4,45}"  required>
         </mat-form-field>
 
 
@@ -30,7 +30,6 @@
             obligatorio
           </mat-hint>
         </mat-form-field>
-      
         <mat-form-field fxFlex appearance="outline">
           <mat-label>estado</mat-label>
           <mat-select name="activo" id="activo" [(ngModel)]="categorias.activo" 	#activo="ngModel" required>
@@ -42,24 +41,41 @@
                         es
                         obligatorio</mat-hint>
         </mat-form-field>
-
       </div>
-
-
       <div>
         <button type="submit" mat-raised-button color="primary" [disabled]="!formCategoric.form.valid"> Guardar
         </button>
-        <button type="button" (click)="editCategoria()" mat-raised-button color="primary" [disabled]="!formCategoric.form.valid"> Editar
+        <button style="margin-left: 30px;" type="button" (click)="editCategoria()" mat-raised-button color="primary" [disabled]="!formCategoric.form.valid"> Editar
         </button>
          </div>
-<!-- 
-         <div>
-          <button type="button" (click)="imprimir()" mat-raised-button color="primary" [disabled]="!formCategoric.form.valid"> Editar
-          </button>
-          
-        </div> -->
-
     </form>
+
+
+    <div fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap.gt-sm="15px" style="margin-top: 30px;">
+    <table class="table-responsive" style="width: 70%;" >
+      <thead>
+        <tr>
+          <th style="text-align: -webkit-match-parent;">Codigo</th>
+          <th style="text-align: -webkit-match-parent;">Nombre</th>
+          <th style="text-align: -webkit-match-parent;">Descripción</th>
+          <th style="text-align: -webkit-match-parent;">Seleccionar</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of listadoCategorias; let i = index, let object = element">
+          <td  >{{ v.codigo }}</td>
+          <td >{{ v.nombre }}</td>
+          <td >{{ v.descripcion }}</td>
+          <td><button type="button" (click)="selectCategoria(v);  imprimir()" mat-raised-button color="primary"> 
+          <mat-icon>check</mat-icon> 
+          </button></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
   </mat-card-content>
 
 </mat-card>

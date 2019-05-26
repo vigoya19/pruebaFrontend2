@@ -1,6 +1,8 @@
 <mat-card class="example-header-image">
   <mat-card-header>
-    <mat-card-title>Registrar Productos: Andrés Steven Vigoyas Pájaro</mat-card-title>
+    <mat-card-title
+      >Registrar Productos: Andrés Steven Vigoyas Pájaro</mat-card-title
+    >
   </mat-card-header>
 
   <mat-card-content>
@@ -28,7 +30,7 @@
                 #codigo="ngModel"
                 required
                 ngModel
-                pattern="[A-Za-z0-9]{3,10}"
+                pattern="[A-Za-z0-9]{4,10}"
               />
               <mat-hint
                 *ngIf="codigo.invalid && (codigo.dirty || codigo.touched)"
@@ -45,7 +47,7 @@
                 id="nombre1"
                 [(ngModel)]="productos.nombre"
                 ngModel
-                pattern="[A-Za-z0-9]{1,4}"
+                pattern="[A-Za-z0-9]{4,45}"
               />
             </mat-form-field>
 
@@ -97,13 +99,15 @@
             </mat-form-field>
 
             <mat-form-field fxFlex appearance="outline">
-              <mat-label>Categoria</mat-label>
+              <mat-label *ngIf="flag === true">Nueva Categoria</mat-label>
+              <mat-label *ngIf="flag === false">Categoria</mat-label>
+
               <mat-select
                 name="categoria"
                 id="categorias"
                 [(ngModel)]="productos.categoria"
               >
-                <mat-option *ngFor="let cat of categorias" [value]="cat.id">
+                <mat-option *ngFor="let cat of categorias" [value]="cat">
                   {{ cat.nombre }}
                 </mat-option>
               </mat-select>
@@ -141,6 +145,12 @@
                 placeholder="Buscar Productos"
               />
             </mat-form-field>
+            <button
+              type="button"
+              mat-icon-button
+              color="primary"
+              (click)="imprimir()"
+            ></button>
           </div>
           <div
             fxLayout="row wrap"
@@ -157,7 +167,7 @@
             fxLayout.lt-md="column"
             fxLayoutGap.gt-sm="15px"
           >
-            <table mat-table [dataSource]="dataSource" class="table-50">
+            <table mat-table [dataSource]="dataSource" class="table-100">
               <!--- Note that these columns can be defined in any order.
                   The actual rendered columns are set as a property on the row definition" -->
 
@@ -203,13 +213,8 @@
                 </td>
               </ng-container>
 
-              <!-- <ng-container matColumnDef="estado">
-            <th mat-header-cell *matHeaderCellDef> precio </th>
-            <td mat-cell *matCellDef="let element"> {{element.precio || current}} </td>
-          </ng-container> -->
-
               <ng-container matColumnDef="editar">
-                <th mat-header-cell *matHeaderCellDef>Editar</th>
+                <th mat-header-cell *matHeaderCellDef>Seleccionar</th>
                 <td mat-cell *matCellDef="let element">
                   <button
                     type="button"
@@ -218,13 +223,11 @@
                     (click)="
                       productos = element;
                       categoriaInformativa = element.nombreC;
-                      activar_boton(element.id)
+                      activar_boton(element.id);
+                      imprimirSeleccionado(element)
                     "
                   >
-                    <!-- <mat-icon aria-label="Example icon-button with a heart icon" matTooltip="Editar a {{element.nombre}}"
-                  matTooltipPosition="above" [routerLink]="[ './../editar-categorias', element.id ]">
-                  edit</mat-icon> -->
-                    <mat-icon> edit </mat-icon>
+                    <mat-icon> check </mat-icon>
                   </button>
                 </td>
               </ng-container>
@@ -260,7 +263,7 @@
               <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
 
-            <table class="table-responsive">
+            <!-- <table class="table-responsive">
               <thead>
                 <tr>
                   <th scope="col">Categorias</th>
@@ -274,52 +277,18 @@
                       type="button"
                       mat-icon-button
                       color="primary"
-                      (click)="categoriaInformativa = v.nombre;flag = true;productos.categoria = v.id "
+                      (click)="
+                        categoriaInformativa = v.nombre;
+                        flag = true;
+                        productos.categoria = v.id
+                      "
                     >
                       <mat-icon> check</mat-icon>
                     </button>
                   </td>
                 </tr>
               </tbody>
-            </table>
-            <!-- <table mat-table [dataSource]="categoriasDeProductos" class="table-50">
-     
-            <ng-container matColumnDef="codigo">
-              <th mat-header-cell *matHeaderCellDef>Código.</th>
-              <td mat-cell *matCellDef="let element">{{ element.codigo }}</td>
-            </ng-container>
-      
-       
-            <ng-container matColumnDef="nombre">
-              <th mat-header-cell *matHeaderCellDef>Nombre</th>
-              <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
-            </ng-container>
-      
-
-            <ng-container matColumnDef="descripcion">
-              <th mat-header-cell *matHeaderCellDef>descripcion</th>
-              <td mat-cell *matCellDef="let element">{{ element.descripcion }}</td>
-            </ng-container>
-      
-        
-            <ng-container matColumnDef="activo">
-              <th mat-header-cell *matHeaderCellDef>activo</th>
-              <td mat-cell *matCellDef="let element">{{ element.activo }}</td>
-            </ng-container>
-      
-            <ng-container matColumnDef="asignar">
-              <th mat-header-cell *matHeaderCellDef> Asignar </th>
-              <td mat-cell *matCellDef="let element">
-                <button  type="button" mat-icon-button color="primary"   (click)="productos.categoria = element.id" >
-           
-                     <mat-icon> edit </mat-icon>
-                </button>
-              </td>
-            </ng-container>
-      
-            <tr mat-header-row *matHeaderRowDef="displayedColumnCategoria"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumnCategoria"></tr>
-          </table> -->
+            </table> -->
           </div>
         </mat-tab>
 
@@ -338,6 +307,7 @@
         </button>
 
         <button
+          style="margin-left: 30px;"
           *ngIf="flag === true"
           type="submit"
           mat-raised-button

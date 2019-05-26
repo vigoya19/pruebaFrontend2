@@ -18,13 +18,13 @@ const routes: Routes = [
 				pathMatch: 'full'
 			},
 			{
-				path: 'productos',
+				path: 'productos/saveProductos',
 				component: ProductosComponent
 			},
-			{
-				path: 'productos',
-				loadChildren: '../productos/productos.module#ProductosModule'
-			},
+			// {
+			// 	path: 'productos',
+			// 	loadChildren: '../productos/productos.module#ProductosModule'
+			// },
 			{
 				path: 'categorias',
 				loadChildren: '../categorias/categorias.module#CategoriasModule'

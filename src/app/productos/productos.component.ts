@@ -31,11 +31,6 @@ public flag = false;
     { key: 0, value: "Inactivo" }
   ];
 
-
-  // public listadoProductos = [{
-  //   codigo: "001", nombre: 'Hydrogen', descripcion: "hola", marca: 'H',
-  //   categoria: "as", precio: "precio"
-  // }];
   displayedColumns: string[] = [
     "codigo",
     "nombre",
@@ -52,9 +47,7 @@ activar_boton(id){
     if (id!==undefined){
      this.flag = true;
   }
-
 }
-
   displayedColumnsCategoria: string[] = [
     "codigo",
     "nombre",
@@ -69,7 +62,7 @@ activar_boton(id){
     codigo: "",
     nombre: "",
     descripcion: "",
-    activo: 0
+    activo: 1
   };
 
   public productos = {
@@ -98,34 +91,66 @@ activar_boton(id){
     };
   }
 
+  validarRepetidos(array) {
+    let flag = true;
+    let codigo = this.productos.codigo;
+    let nombre = this.productos.nombre;
+    array.filter(function(data) {
+      if (data.codigo === codigo ||  data.nombre  ===  nombre) {
+       flag = false;
+            
+      }else{
+        flag = true;
+      }
+    });
+    return flag;
+  }
+
+
+
   guardarProductos() {
-    if (
-      this.productos.codigo !== undefined &&
-      this.productos.nombre !== undefined &&
-      this.productos.descripcion !== undefined &&
-      this.productos.marca !== undefined &&
-      this.productos.categoria !== undefined &&
-      this.productos.precio !== undefined
-    ) {
-      this.prod.saveProductos(this.productos).subscribe((data: any) => {
-        if (data.staus == "succes") {
-          swal.fire({
-            title: "Bien..!",
-            text: `EL producto ${
-              this.productos.nombre
-            } fue creado exitosamente..!`,
-            type: "success"
-          });
-        }
-        this.limpiarFormulario();
-      });
-    } else {
-      swal.fire({
-        title: "Error..!",
-        text: `Faltan campos por llenar, por favor verifique`,
-        type: "error"
-      });
-    }
+
+if( this.validarRepetidos(this.listadoProductos)=== true){
+
+  if (
+    this.productos.codigo !== undefined &&
+    this.productos.nombre !== undefined &&
+    this.productos.descripcion !== undefined &&
+    this.productos.marca !== undefined &&
+    this.productos.categoria !== undefined &&
+    this.productos.precio !== undefined
+  ) {
+    this.prod.saveProductos(this.productos).subscribe((data: any) => {
+      if (data.staus == "succes") {
+        swal.fire({
+          title: "Bien..!",
+          text: `EL producto ${
+            this.productos.nombre
+          } fue creado exitosamente..!`,
+          type: "success"
+        });
+      }
+      this.limpiarFormulario();
+    });
+  } else {
+    swal.fire({
+      title: "Error..!",
+      text: `Faltan campos por llenar, por favor verifique`,
+      type: "error"
+    });
+  }
+  
+}else{
+  swal.fire({
+    title: "Error..!",
+    text: `El nombre o código ya se encuentra registrado en la base de datos`,
+    type: "error"
+  });
+}
+
+
+
+
   }
 
   getProductos() {
@@ -211,9 +236,12 @@ activar_boton(id){
       this.categoriasDeProductos = data;
 
       console.log(this.categoriasDeProductos);
-      // console.log(this.categoriasDeProductos);
-      // this.dataSourceCategoria = this.categoriasDeProductos;
+
     });
+  }
+
+  imprimirSeleccionado(element){
+    console.log(element);
   }
 
   imprimir() {

@@ -8,6 +8,7 @@ import {
 } from "@angular/material";
 import swal from "sweetalert2";
 import { throwError } from "rxjs";
+import { tryParse } from 'selenium-webdriver/http';
 
 @Component({
   selector: "app-categorias",
@@ -22,7 +23,7 @@ export class CategoriasComponent implements OnInit {
     codigo: "",
     nombre: "",
     descripcion: "",
-    activo: 0
+    activo: 1
   };
   public prueba;
   imprimir() {
@@ -63,32 +64,58 @@ export class CategoriasComponent implements OnInit {
     { key: 0, value: "Inactivo" }
   ];
 
+  validarRepetidos(array) {
+    let flag = true;
+    let codigo = this.categorias.codigo;
+    let nombre = this.categorias.nombre;
+    array.filter(function(data) {
+      if (data.codigo === codigo ||  data.nombre  ===  nombre) {
+       flag = false;
+            
+      }else{
+        flag = true;
+      }
+    });
+    return flag;
+  }
+
   saveCategoria() {
-    if (
-      this.categorias.activo !== undefined &&
-      this.categorias.codigo !== undefined &&
-      this.categorias.descripcion !== undefined &&
-      this.categorias.nombre !== undefined
-    ) {
-      this.service.saveCategoria(this.categorias).subscribe((data: any) => {
-        if (data.status == "succes") {
+   
+      if(this.validarRepetidos(this.listadoCategorias) == true ){
+        if (
+          this.categorias.activo !== undefined &&
+          this.categorias.codigo !== undefined &&
+          this.categorias.descripcion !== undefined &&
+          this.categorias.nombre !== undefined
+        ) {
+          this.service.saveCategoria(this.categorias).subscribe((data: any) => {
+            if (data.status == "succes") {
+              swal.fire({
+                title: "Bien..!",
+                text: `La categoria ${
+                  this.categorias.nombre
+                } fue creada exitosamente..!`,
+                type: "success"
+              });
+            }
+            this.limpiarFormulario();
+          });
+        } else {
           swal.fire({
-            title: "Bien..!",
-            text: `La categoria ${
-              this.categorias.nombre
-            } fue creada exitosamente..!`,
-            type: "success"
+            title: "Error..!",
+            text: `Faltan campos por llenar, por favor verifique`,
+            type: "error"
           });
         }
-        this.limpiarFormulario();
+      }else{
+        swal.fire({
+                title: "Error..!",
+                text: `El Nombre o Código ya se encuentra registrado, verifique!`,
+                type: "error"
       });
-    } else {
-      swal.fire({
-        title: "Error..!",
-        text: `Faltan campos por llenar, por favor verifique`,
-        type: "error"
-      });
-    }
+
+            }
+   
   }
 
   getCategorias() {
@@ -106,7 +133,9 @@ export class CategoriasComponent implements OnInit {
   }
 
   editCategoria() {
-    this.service
+
+    // if(this.validarRepetidos(this.listadoCategorias) == true ){
+      this.service
       .updateCategoria(this.categorias.id, this.categorias)
       .subscribe((data: any) => {
         console.log(data.status == "succes");
@@ -117,58 +146,73 @@ export class CategoriasComponent implements OnInit {
           } fue editada exitosamente..!`,
           type: "success"
         });
-       this.limpiarFormulario();
-         
+        this.limpiarFormulario();
       });
+    // }else {
+      swal.fire({
+        title: "Error..!",
+        text: `El Nombre o Código ya se encuentra registrado, verifique!`,
+        type: "error"
+
+        });
+    // }
+    
   }
 
-  deleteCategoria(id){
+  selectCategoria(object) {
+    this.categorias = object;
+    if (object.activo == true) {
+      this.categorias.activo = 1;
+    } else {
+      this.categorias.activo = 0;
+    }
+  }
+
+  deleteCategoria(id) {
     const swalWithBootstrapButtons = swal.mixin({
       customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger"
       },
-      buttonsStyling: false,
-    })
-    
-    swalWithBootstrapButtons.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      type: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-      reverseButtons: true
-    }).then((result) => {
-      if (result.value) {
-       //AQUI ENTRA SI ENTRA
-        
-       this.service.deleteCategoria(id).subscribe((data:any) => {
-             console.log(data);
-              
+      buttonsStyling: false
+    });
 
-       } )
-       
-       swalWithBootstrapButtons.fire(
-          'Deleted!',
-          'Your file has been deleted.',
-          'success'
-        )
-      } else if (
-        // Read more about handling dismissals
-        result.dismiss === swal.DismissReason.cancel
-      ) {
-       //AQUI ENTRA SI CANCELO
-        swalWithBootstrapButtons.fire(
-          'Cancelled',
-          'Your imaginary file is safe :)',
-          'error'
-        )
-      }
-    })
+    swalWithBootstrapButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true
+      })
+      .then(result => {
+        if (result.value) {
+          //AQUI ENTRA SI ENTRA
 
+          this.service.deleteCategoria(id).subscribe((data: any) => {
+            console.log(data);
+          });
 
- 
+          swalWithBootstrapButtons.fire(
+            "Deleted!",
+            "Your file has been deleted.",
+            "success"
+          );
+        } else if (
+          // Read more about handling dismissals
+          result.dismiss === swal.DismissReason.cancel
+        ) {
+          //AQUI ENTRA SI CANCELO
+          swalWithBootstrapButtons.fire(
+            "Cancelled",
+            "Your imaginary file is safe :)",
+            "error"
+          );
+        }
+      });
+
     // });
   }
 
