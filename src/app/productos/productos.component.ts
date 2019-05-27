@@ -15,16 +15,15 @@ import {
 })
 export class ProductosComponent implements OnInit {
   constructor(private prod: ProductosService, private cs: CategoriasService) {}
-
+  @ViewChild('tabla') table: MatTable<any>;
   public dataSource: any;
   public dataSourceCategoria: any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-public flag = false;
+  public flag = false;
   public listadoProductos: any = [];
   public categorias;
   public categoriasDeProductos;
   public categoriaInformativa;
-
 
   public estado: any[] = [
     { key: 1, value: "Activo" },
@@ -43,18 +42,18 @@ public flag = false;
     "categorias"
   ];
 
-activar_boton(id){
-    if (id!==undefined){
-     this.flag = true;
+  activar_boton(id) {
+    if (id !== undefined) {
+      this.flag = true;
+    }
   }
-}
+
   displayedColumnsCategoria: string[] = [
     "codigo",
     "nombre",
     "descripcion",
     "activo",
     "asignar"
-    
   ];
 
   public categoriasData = {
@@ -96,70 +95,68 @@ activar_boton(id){
     let codigo = this.productos.codigo;
     let nombre = this.productos.nombre;
     array.filter(function(data) {
-      if (data.codigo === codigo ||  data.nombre  ===  nombre) {
-       flag = false;
-            
-      }else{
+      if (data.codigo === codigo || data.nombre === nombre) {
+        flag = false;
+      } else {
         flag = true;
       }
     });
     return flag;
   }
 
-
-
   guardarProductos() {
-
-if( this.validarRepetidos(this.listadoProductos)=== true){
-
-  if (
-    this.productos.codigo !== undefined &&
-    this.productos.nombre !== undefined &&
-    this.productos.descripcion !== undefined &&
-    this.productos.marca !== undefined &&
-    this.productos.categoria !== undefined &&
-    this.productos.precio !== undefined
-  ) {
-    this.prod.saveProductos(this.productos).subscribe((data: any) => {
-      if (data.staus == "succes") {
+    if (this.validarRepetidos(this.listadoProductos) === true) {
+      if (
+        this.productos.codigo !== undefined &&
+        this.productos.nombre !== undefined &&
+        this.productos.descripcion !== undefined &&
+        this.productos.marca !== undefined &&
+        this.productos.categoria !== undefined &&
+        this.productos.precio !== undefined
+      ) {
+        this.prod.saveProductos(this.productos).subscribe((data: any) => {
+          if (data.staus == "succes") {
+            swal.fire({
+              title: "Bien..!",
+              text: `EL producto ${
+                this.productos.nombre
+              } fue creado exitosamente..!`,
+              type: "success"
+            });
+            this.getProductos();
+          }
+          this.limpiarFormulario();
+        });
+      } else {
         swal.fire({
-          title: "Bien..!",
-          text: `EL producto ${
-            this.productos.nombre
-          } fue creado exitosamente..!`,
-          type: "success"
+          title: "Error..!",
+          text: `Faltan campos por llenar, por favor verifique`,
+          type: "error"
         });
       }
-      this.limpiarFormulario();
-    });
-  } else {
-    swal.fire({
-      title: "Error..!",
-      text: `Faltan campos por llenar, por favor verifique`,
-      type: "error"
-    });
-  }
-  
-}else{
-  swal.fire({
-    title: "Error..!",
-    text: `El nombre o código ya se encuentra registrado en la base de datos`,
-    type: "error"
-  });
-}
-
-
-
-
+    } else {
+      swal.fire({
+        title: "Error..!",
+        text: `El nombre o código ya se encuentra registrado en la base de datos`,
+        type: "error"
+      });
+    }
   }
 
   getProductos() {
     this.prod.getProductos().subscribe((data: any) => {
       this.listadoProductos = data;
       this.dataSource = new MatTableDataSource<any>(data);
+    if(this.dataSource.length > 0){
+      this.table.renderRows();
       this.dataSource.paginator = this.paginator;
       console.log(this.listadoProductos);
+  }
     });
+  }
+
+  recargar_tabla(){
+    this.getProductos();
   }
 
   editProductos() {
@@ -175,6 +172,7 @@ if( this.validarRepetidos(this.listadoProductos)=== true){
             type: "success"
           });
           this.limpiarFormulario();
+          this.getProductos();
         } else {
           swal.fire({
             title: "Error..!",
@@ -215,10 +213,9 @@ if( this.validarRepetidos(this.listadoProductos)=== true){
             "success"
           );
         } else if (
-          // Read more about handling dismissals
+         
           result.dismiss === swal.DismissReason.cancel
         ) {
-          //AQUI ENTRA SI CANCELO
           swalWithBootstrapButtons.fire(
             "Cancelled",
             "Your imaginary file is safe :)",
@@ -232,15 +229,13 @@ if( this.validarRepetidos(this.listadoProductos)=== true){
     console.log(id);
     this.prod.showCategoriesByProductos(id).subscribe((data: any) => {
       
-      // this.dataSourceCategoria = data;
       this.categoriasDeProductos = data;
 
       console.log(this.categoriasDeProductos);
-
     });
   }
 
-  imprimirSeleccionado(element){
+  imprimirSeleccionado(element) {
     console.log(element);
   }
 

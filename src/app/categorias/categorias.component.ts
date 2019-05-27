@@ -8,7 +8,8 @@ import {
 } from "@angular/material";
 import swal from "sweetalert2";
 import { throwError } from "rxjs";
-import { tryParse } from 'selenium-webdriver/http';
+import { tryParse } from "selenium-webdriver/http";
+import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 
 @Component({
   selector: "app-categorias",
@@ -26,9 +27,18 @@ export class CategoriasComponent implements OnInit {
     activo: 1
   };
   public prueba;
+  public flag = false;
+
   imprimir() {
     console.log(this.categorias);
   }
+
+  activar_boton(id) {
+    if (id !== undefined) {
+      this.flag = true;
+    }
+  }
+  
 
   limpiarFormulario() {
     this.categorias = {
@@ -44,17 +54,16 @@ export class CategoriasComponent implements OnInit {
   public listadoCategorias;
 
   public dataCategorias: MatTableDataSource<any>; // Mi objeto tipo matTable para actualizar mi tabla
-  @ViewChild("pcategorias") pCategorias: MatPaginator;
-  @ViewChild("tcategoria") TCategorias: MatTable<any>;
-
+  // @ViewChild("pcategorias") pCategorias: MatPaginator;
+  @ViewChild("tabla") table: MatTable<any>;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
   // tCategorias ;
   displayedColumns: string[] = [
     "codigo",
     "nombre",
     "descripcion",
     "activo",
-    "editar",
-    "eliminar"
+    "editar"
   ];
 
   // public listadoCategorias = [{
@@ -69,10 +78,9 @@ export class CategoriasComponent implements OnInit {
     let codigo = this.categorias.codigo;
     let nombre = this.categorias.nombre;
     array.filter(function(data) {
-      if (data.codigo === codigo ||  data.nombre  ===  nombre) {
-       flag = false;
-            
-      }else{
+      if (data.codigo === codigo || data.nombre === nombre) {
+        flag = false;
+      } else {
         flag = true;
       }
     });
@@ -80,62 +88,59 @@ export class CategoriasComponent implements OnInit {
   }
 
   saveCategoria() {
-   
-      if(this.validarRepetidos(this.listadoCategorias) == true ){
-        if (
-          this.categorias.activo !== undefined &&
-          this.categorias.codigo !== undefined &&
-          this.categorias.descripcion !== undefined &&
-          this.categorias.nombre !== undefined
-        ) {
-          this.service.saveCategoria(this.categorias).subscribe((data: any) => {
-            if (data.status == "succes") {
-              swal.fire({
-                title: "Bien..!",
-                text: `La categoria ${
-                  this.categorias.nombre
-                } fue creada exitosamente..!`,
-                type: "success"
-              });
-            }
-            this.limpiarFormulario();
-          });
-        } else {
-          swal.fire({
-            title: "Error..!",
-            text: `Faltan campos por llenar, por favor verifique`,
-            type: "error"
-          });
-        }
-      }else{
+    if (this.validarRepetidos(this.listadoCategorias) == true) {
+      if (
+        this.categorias.activo !== undefined &&
+        this.categorias.codigo !== undefined &&
+        this.categorias.descripcion !== undefined &&
+        this.categorias.nombre !== undefined
+      ) {
+        this.service.saveCategoria(this.categorias).subscribe((data: any) => {
+          if (data.status == "succes") {
+            swal.fire({
+              title: "Bien..!",
+              text: `La categoria ${
+                this.categorias.nombre
+              } fue creada exitosamente..!`,
+              type: "success"
+            });
+            this.getCategorias();
+          }
+          this.limpiarFormulario();
+        });
+      } else {
         swal.fire({
-                title: "Error..!",
-                text: `El Nombre o Código ya se encuentra registrado, verifique!`,
-                type: "error"
+          title: "Error..!",
+          text: `Faltan campos por llenar, por favor verifique`,
+          type: "error"
+        });
+      }
+    } else {
+      swal.fire({
+        title: "Error..!",
+        text: `El Nombre o Código ya se encuentra registrado, verifique!`,
+        type: "error"
       });
-
-            }
-   
+    }
   }
 
   getCategorias() {
     this.service.getCategorias().subscribe((data: any) => {
       this.listadoCategorias = data;
       if (this.listadoCategorias) {
-        this.dataCategorias = new MatTableDataSource<any>(
-          this.listadoCategorias
-        );
-        this.dataCategorias.paginator = this.pCategorias; //con esto pagino en angular material
+        this.dataSource = new MatTableDataSource<any>(this.listadoCategorias);
+        if (this.dataSource.length > 0) {
+          this.table.renderRows();
+          this.dataSource.paginator = this.paginator;
+        }
       }
-      console.log(this.listadoCategorias);
-      this.dataSource = this.listadoCategorias;
+      console.log(this.dataSource);
     });
   }
 
   editCategoria() {
-
     // if(this.validarRepetidos(this.listadoCategorias) == true ){
-      this.service
+    this.service
       .updateCategoria(this.categorias.id, this.categorias)
       .subscribe((data: any) => {
         console.log(data.status == "succes");
@@ -147,16 +152,15 @@ export class CategoriasComponent implements OnInit {
           type: "success"
         });
         this.limpiarFormulario();
+        this.getCategorias();
       });
     // }else {
-      swal.fire({
-        title: "Error..!",
-        text: `El Nombre o Código ya se encuentra registrado, verifique!`,
-        type: "error"
-
-        });
+    swal.fire({
+      title: "Error..!",
+      text: `El Nombre o Código ya se encuentra registrado, verifique!`,
+      type: "error"
+    });
     // }
-    
   }
 
   selectCategoria(object) {
